@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pregunta</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Poppins', 'Segoe UI', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: calc(32px + 76px) 20px 24px; /* ⬆ +2 cm */
+      text-align: center;
+      position: relative;
+    }
+
+    .gif {
+      height: 280px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: calc(16px + 76px); /* ⬆ +2 cm */
+      margin-bottom: 8px;
+    }
+
+    .gif img {
+      max-height: 100%;
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    .content {
+      width: 100%;
+      margin-top: 24px;
+    }
+
+    h1 {
+      font-weight: 400;
+      font-size: 1.4rem;
+      line-height: 1.55;
+      color: #111;
+      margin: 0 0 24px;
+      opacity: 0;
+      transform: translateY(0);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    h1.show {
+      opacity: 1;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      min-height: 44px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .buttons.show {
+      opacity: 1;
+    }
+
+    button {
+      width: 120px;
+      height: 44px;
+      border-radius: 30px;
+      border: none;
+      background: #000;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    #btnNo {
+      position: relative;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <div class="gif">
+      <img id="gifImage" src="" alt="gif" />
+    </div>
+
+    <div class="content">
+      <h1 id="title"></h1>
+
+      <div class="buttons" id="buttons" style="display:none;">
+        <button id="btnYes">Sí</button>
+        <button id="btnNo">No</button>
+      </div>
+
+      <div class="buttons" id="whatsappBox" style="display:none;">
+        <a id="btnWhatsApp" href="#" target="_blank">
+          <button>Quiero saber más</button>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const SCENARIO_DELAY = 5000;
+    const OFFSET_CM = 38; // 1 cm ≈ 38px
+
+    const title = document.getElementById('title');
+    const buttons = document.getElementById('buttons');
+    const btnYes = document.getElementById('btnYes');
+    const btnNo = document.getElementById('btnNo');
+    const gif = document.getElementById('gifImage');
+    const waBox = document.getElementById('whatsappBox');
+
+    let noCount = 0;
+
+    function resetUI() {
+      buttons.style.display = 'none';
+      buttons.classList.remove('show');
+      waBox.style.display = 'none';
+      waBox.classList.remove('show');
+      btnNo.onmouseenter = null;
+      btnNo.onclick = null;
+      title.classList.remove('show');
+      title.style.transform = 'translateY(0)';
+    }
+
+    function loadScenario(num) {
+      resetUI();
+
+      setTimeout(() => {
+        switch (num) {
+
+          case 1:
+            gif.src = 'trabajando.gif';
+            title.textContent =
+              'Sé que has estado muy ocupada y, probablemente, algo estresada.';
+            title.style.transform = `translateY(${OFFSET_CM}px)`; // ⬇ 1 cm
+            title.classList.add('show');
+            setTimeout(() => loadScenario(2), SCENARIO_DELAY);
+            break;
+
+          case 2:
+            gif.src = 'pregunta.gif';
+            title.textContent =
+              'Por eso pensé que tal vez podríamos salir un poco de la rutina.';
+            title.style.transform = `translateY(${OFFSET_CM}px)`; // ⬇ 1 cm
+            title.classList.add('show');
+            setTimeout(() => loadScenario(3), SCENARIO_DELAY);
+            break;
+
+          case 3:
+            gif.src = 'duda.gif';
+            title.textContent =
+              '¿Te gustaría salir conmigo este fin de semana?';
+            title.classList.add('show');
+            buttons.style.display = 'flex';
+            setTimeout(() => buttons.classList.add('show'), 100);
+            break;
+
+          case 4:
+            gif.src = 'celebrar.gif';
+            title.textContent =
+              'Tengo varios planes en mente, algunos más tranquilos que otros. Para más detalles, escríbeme por interno.';
+            title.classList.add('show');
+
+            const phone = '573002557145'; // cel
+            const message = encodeURIComponent(
+              'Hola, Que planes tienes en mente… cuéntame más'
+            );
+            document.getElementById('btnWhatsApp').href =
+              `https://wa.me/${phone}?text=${message}`;
+
+            waBox.style.display = 'flex';
+            setTimeout(() => waBox.classList.add('show'), 100);
+            break;
+
+          case 5:
+            gif.src = 'mirada.gif';
+            title.textContent =
+              '¿Te animas a reconsiderar tu respuesta?';
+            title.classList.add('show');
+            buttons.style.display = 'flex';
+            setTimeout(() => buttons.classList.add('show'), 100);
+            break;
+
+          case 6:
+            gif.src = 'criterio.gif';
+            title.textContent =
+              'Dicen que a veces un “no” es solo un “sí” que necesita un pequeño empujón.';
+            title.classList.add('show');
+            buttons.style.display = 'flex';
+            setTimeout(() => buttons.classList.add('show'), 100);
+
+            btnNo.onmouseenter = () => {
+              if (!isMobile()) moveNoButton();
+            };
+
+            btnNo.onclick = (e) => {
+              if (isMobile()) {
+                e.preventDefault();
+                moveNoButton();
+              }
+            };
+            break;
+        }
+      }, 200);
+    }
+
+    function moveNoButton() {
+      const container = document.querySelector('.container');
+      const maxX = container.clientWidth - btnNo.offsetWidth;
+      const maxY = container.clientHeight - btnNo.offsetHeight;
+
+      btnNo.style.position = 'absolute';
+      btnNo.style.left = Math.random() * maxX + 'px';
+      btnNo.style.top = Math.random() * maxY + 'px';
+    }
+
+    btnYes.addEventListener('click', () => loadScenario(4));
+
+    btnNo.addEventListener('click', () => {
+      noCount++;
+      noCount === 1 ? loadScenario(5) : loadScenario(6);
+    });
+
+    function isMobile() {
+      return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    }
+
+    loadScenario(1);
+  </script>
+</body>
+</html>
