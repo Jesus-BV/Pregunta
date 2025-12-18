@@ -28,7 +28,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding: calc(32px + 76px) 20px 24px; /* ⬆ +2 cm */
+      padding: calc(32px + 76px) 20px 24px;
       text-align: center;
       position: relative;
     }
@@ -39,7 +39,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: calc(16px + 76px); /* ⬆ +2 cm */
+      margin-top: calc(16px + 76px);
       margin-bottom: 8px;
     }
 
@@ -92,11 +92,6 @@
       font-size: 0.95rem;
       font-weight: 500;
       cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    button:hover {
-      transform: scale(1.05);
     }
 
     #btnNo {
@@ -131,7 +126,7 @@
 
   <script>
     const SCENARIO_DELAY = 5000;
-    const OFFSET_CM = 38; // 1 cm ≈ 38px
+    const OFFSET_CM = 38;
 
     const title = document.getElementById('title');
     const buttons = document.getElementById('buttons');
@@ -141,16 +136,22 @@
     const waBox = document.getElementById('whatsappBox');
 
     let noCount = 0;
+    let evasiveActive = false;
 
     function resetUI() {
       buttons.style.display = 'none';
       buttons.classList.remove('show');
       waBox.style.display = 'none';
       waBox.classList.remove('show');
-      btnNo.onmouseenter = null;
-      btnNo.onclick = null;
       title.classList.remove('show');
       title.style.transform = 'translateY(0)';
+      evasiveActive = false;
+
+      // volver a estado normal
+      btnNo.style.position = 'relative';
+      btnNo.style.left = '0';
+      btnNo.style.top = '0';
+      btnNo.style.zIndex = 'auto';
     }
 
     function loadScenario(num) {
@@ -163,7 +164,7 @@
             gif.src = 'trabajando.gif';
             title.textContent =
               'Sé que has estado muy ocupada y, probablemente, algo estresada.';
-            title.style.transform = `translateY(${OFFSET_CM}px)`; // ⬇ 1 cm
+            title.style.transform = `translateY(${OFFSET_CM}px)`;
             title.classList.add('show');
             setTimeout(() => loadScenario(2), SCENARIO_DELAY);
             break;
@@ -172,7 +173,7 @@
             gif.src = 'pregunta.gif';
             title.textContent =
               'Por eso pensé que tal vez podríamos salir un poco de la rutina.';
-            title.style.transform = `translateY(${OFFSET_CM}px)`; // ⬇ 1 cm
+            title.style.transform = `translateY(${OFFSET_CM}px)`;
             title.classList.add('show');
             setTimeout(() => loadScenario(3), SCENARIO_DELAY);
             break;
@@ -192,7 +193,7 @@
               'Tengo varios planes en mente, algunos más tranquilos que otros. Para más detalles, escríbeme por interno.';
             title.classList.add('show');
 
-            const phone = '573002557145'; // cel
+            const phone = '573002557145';
             const message = encodeURIComponent(
               'Hola, Que planes tienes en mente… cuéntame más'
             );
@@ -219,31 +220,45 @@
             title.classList.add('show');
             buttons.style.display = 'flex';
             setTimeout(() => buttons.classList.add('show'), 100);
-
-            btnNo.onmouseenter = () => {
-              if (!isMobile()) moveNoButton();
-            };
-
-            btnNo.onclick = (e) => {
-              if (isMobile()) {
-                e.preventDefault();
-                moveNoButton();
-              }
-            };
+            evasiveActive = true;
             break;
         }
       }, 200);
     }
 
     function moveNoButton() {
-      const container = document.querySelector('.container');
-      const maxX = container.clientWidth - btnNo.offsetWidth;
-      const maxY = container.clientHeight - btnNo.offsetHeight;
+      if (!evasiveActive) return;
 
-      btnNo.style.position = 'absolute';
+      const padding = 10;
+      const maxX = window.innerWidth - btnNo.offsetWidth - padding;
+      const maxY = window.innerHeight - btnNo.offsetHeight - padding;
+
+      btnNo.style.position = 'fixed';
       btnNo.style.left = Math.random() * maxX + 'px';
       btnNo.style.top = Math.random() * maxY + 'px';
+      btnNo.style.zIndex = 9999;
     }
+
+    // PC
+    btnNo.addEventListener('mouseenter', moveNoButton);
+    btnNo.addEventListener('mousedown', e => {
+      if (!evasiveActive) return;
+      e.preventDefault();
+      moveNoButton();
+    });
+
+    // MÓVIL
+    btnNo.addEventListener('touchstart', e => {
+      if (!evasiveActive) return;
+      e.preventDefault();
+      moveNoButton();
+    }, { passive: false });
+
+    btnNo.addEventListener('click', e => {
+      if (!evasiveActive) return;
+      e.preventDefault();
+      moveNoButton();
+    });
 
     btnYes.addEventListener('click', () => loadScenario(4));
 
@@ -251,10 +266,6 @@
       noCount++;
       noCount === 1 ? loadScenario(5) : loadScenario(6);
     });
-
-    function isMobile() {
-      return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    }
 
     loadScenario(1);
   </script>
